@@ -3,6 +3,7 @@ import altair_saver
 import pandas as pd
 import numpy as np
 import geopandas as gpd # Requires geopandas -- e.g.: conda install -c conda-forge geopandas
+import gpdvega
 
 alt.data_transformers.enable('json')
 babyNames = pd.read_csv("dpt2020.csv", sep=";")
