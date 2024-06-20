@@ -8,7 +8,7 @@ import gpdvega
 alt.data_transformers.enable('json')
 babyNames = pd.read_csv("dpt2020.csv", sep=";")
 
- # file for the departments
+# file for the departments
 path = 'departements-version-simplifiee.geojson'
 depts = gpd.read_file(path)
 
@@ -51,13 +51,13 @@ vis1 = alt.Chart(noDtpNames).transform_calculate(
     point
 )
 
-vis1.save('Vis1.html')
+vis1.save('Html/Vis1.html')
 
 
 """ Visualisation 2"""
 
 # merge the 2 datasets
-names = depts.merge(names, how='right', left_on='code', right_on='dpt')
+names = depts.merge(babyNames, how='right', left_on='code', right_on='dpt')
 grouped = names.groupby(['dpt', 'preusuel', 'sexe', 'geometry', 'nom', 'code'], as_index=False).sum()
 
 # on this part, we will take the 3 most popular names of each department and see how they are distributed accross the country
@@ -139,8 +139,8 @@ for num in num_departments:
         color = 'independent'
     )
 
-vis2_1.save('Vis2_1.html')
-vis2_2.save('Vis2_2.html')
+vis2_1.save('Html/Vis2_1.html')
+vis2_2.save('Html/Vis2_2.html')
 
 """ Visualisation 3"""
 
@@ -191,15 +191,14 @@ female_chart = female + textfemale
 # showing graph
 vis3 = alt.hconcat(male_chart, female_chart).resolve_scale(y='shared')
 
-vis3.save('Vis3.html')
-
-""" All Visualisation """
+vis3.save('Html/Vis3.html')
 
 
-allVis = alt.vconcat(vis1, vis2, vis3).resolve_scale(
+
+""" All Visualisations """
+
+allVis = alt.vconcat(vis1, vis2_1, vis2_2, vis3).resolve_scale(
     color='independent'
 )
 
-
-
-allVis.save('index.html')
+allVis.save('Html/index.html')
