@@ -100,6 +100,7 @@ for num in num_departments:
     vis2_1 = alt.hconcat(charts[0], charts[1], charts[2]).resolve_scale(
         color = 'independent'
     )
+    vis2_1.save('Html/Vis2_1' + str(num) + '.html')
 
 # on this part, we will take the 3 less popular names of each department and see how they are distributed accross the country
 
@@ -138,9 +139,7 @@ for num in num_departments:
     vis2_2 = alt.hconcat(charts[0], charts[1], charts[2]).resolve_scale(
         color = 'independent'
     )
-
-vis2_1.save('Html/Vis2_1.html')
-vis2_2.save('Html/Vis2_2.html')
+    vis2_2.save('Html/Vis2_2' + str(num) + '.html')
 
 """ Visualisation 3"""
 
