@@ -45,8 +45,13 @@ All the questions can be answered expect for the unpopular part of them.
 - Are some names more popular in some regions? 
 - Are popular names generally popular across the whole country?
 ### Weaknesses
+Can be cumbersome if we want to take into consideration more names(in our case we visualized the 3 less and more popular names of 5 departments) 
+
 ### Strengths
+Show the repartition of the names across the country 
+
 ### does it acheive the goals
+Yes it does
 
 ## Critique on Visualisation 3
 ### Goals : 
