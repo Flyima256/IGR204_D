@@ -150,11 +150,13 @@ total_by_year = noDtpNames.groupby(['sexe', 'annais'])['nombre'].sum().reset_ind
 most_common_names = most_common_names.merge(total_by_year, on=['sexe', 'annais'], suffixes=('', '_total'))
 most_common_names['pourcentage'] = most_common_names['nombre'] / most_common_names['nombre_total'] * 100
 
+x_domain = [0, most_common_names['pourcentage'].max()]
+
 #male_names = most_common_names[most_common_names['sexe'] == 1]
 
 #male
 male = alt.Chart(most_common_names).mark_bar().encode(
-    x=alt.X('pourcentage:Q', title='Proportion nom masculin (%)', scale=alt.Scale(reverse=True)),
+    x=alt.X('pourcentage:Q', title='Proportion nom masculin (%)', scale=alt.Scale(domain=x_domain, reverse=True)),
     y=alt.Y('annais:O', title='Année', sort=alt.EncodingSortField(field='annais', order='descending'), axis=None)
 ).transform_filter(
     alt.datum.sexe == 1
@@ -171,7 +173,7 @@ male_chart = male + textmale
 
 #female
 female = alt.Chart(most_common_names).mark_bar().encode(
-    x=alt.X('pourcentage:Q', title='Proportion nom feminin (%)'),
+    x=alt.X('pourcentage:Q', title='Proportion nom feminin (%)', scale=alt.Scale(domain=x_domain)),
     y=alt.Y('annais:O', title='Année', sort=alt.EncodingSortField(field='annais', order='descending'))
 ).transform_filter(
     alt.datum.sexe == 2
