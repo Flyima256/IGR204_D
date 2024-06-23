@@ -48,6 +48,7 @@ All the questions can be answered exept for the unpopular part of them.
 - If we want to observe more than the top 3 most and least popular names, the graph quickly becomes cluttered.
 ### Strengths
 - We can see the distribution of popular and unpopular names across the entire territory.
+- Can be cumbersome if we want to take into consideration more names(in our case we visualized the 3 less and more popular names of 5 departments) 
 ### does it acheive the goals
 Yes, the visualization effectively shows regional effects and the popularity of names in different regions, despite the potential clutter when displaying more names.
 
