@@ -55,7 +55,7 @@ vis1.save('Html/Vis1.html')
 
 
 """ Visualisation 2"""
-
+vis2 = None
 # merge the 2 datasets
 names = depts.merge(babyNames, how='right', left_on='code', right_on='dpt')
 grouped = names.groupby(['dpt', 'preusuel', 'sexe', 'geometry', 'nom', 'code'], as_index=False).sum()
@@ -100,6 +100,10 @@ for num in num_departments:
     vis2_1 = alt.hconcat(charts[0], charts[1], charts[2]).resolve_scale(
         color = 'independent'
     )
+    if (vis2 == None) :
+        vis2 = vis2_1
+    else :
+        vis2 = alt.vconcat(vis2, vis2_1).resolve_scale(color='independent')
     vis2_1.save('Html/Vis2_1' + str(num) + '.html')
 
 # on this part, we will take the 3 less popular names of each department and see how they are distributed accross the country
@@ -139,8 +143,10 @@ for num in num_departments:
     vis2_2 = alt.hconcat(charts[0], charts[1], charts[2]).resolve_scale(
         color = 'independent'
     )
+    vis2 = alt.vconcat(vis2, vis2_2).resolve_scale(color='independent')
     vis2_2.save('Html/Vis2_2' + str(num) + '.html')
 
+vis2.save('Html/Vis2.html')
 """ Visualisation 3"""
 
 most_common_names = noDtpNames.loc[noDtpNames.groupby(['sexe', 'annais'])['nombre'].idxmax()]
@@ -198,7 +204,7 @@ vis3.save('Html/Vis3.html')
 
 """ All Visualisations """
 
-allVis = alt.vconcat(vis1, vis2_1, vis2_2, vis3).resolve_scale(
+allVis = alt.vconcat(vis1, vis2, vis3).resolve_scale(
     color='independent'
 )
 

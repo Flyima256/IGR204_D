@@ -1,18 +1,16 @@
 # IGR204 project group D
 
 ## Members 
-| Name                    | GitHub      |
-| --------                | -------     |
-| Christiane Ayo Ndazo'o  | Manuela-AYO |
-| Adama Koita             | dororo-ak   |
-| Iris Tuffraud           | Flyima256   |
+| Name                    | GitHub      | What did we do  |
+| --------                | -------     | -------         |
+| Christiane Ayo Ndazo'o  | Manuela-AYO | Visualisation 2 |
+| Adama Koita             | dororo-ak   | Visualisation 3 |
+| Iris Tuffraud           | Flyima256   | Visualisation 1 |
 
 ## Run our project
 Run the python file project.py   
 All visualisation will be saved in the folder names Html.  
 There is one html file for each visualisation and the file index.html include all visualisation.
-
-Since running project.py takes a long time, all html files are already saved in the folder.
 
 ### Dependencies 
 We used these python packages, make sure to install them before running project.py :
