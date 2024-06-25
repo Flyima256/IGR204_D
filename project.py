@@ -18,6 +18,7 @@ noDtpNames = babyNames.groupby(['sexe', 'preusuel', 'annais'], as_index=False).a
 """ Visualisation 1 """
 # Get number of baby for each year
 yearSum = noDtpNames.groupby(['annais'], as_index=False).agg({'nombre': 'sum'})
+maxPercentage = 0
 
 # Calculate the percentage of each {gender, name, year} data in relation to the total number of the year
 def pourcentageCalculation(onedata) :
@@ -26,29 +27,51 @@ def pourcentageCalculation(onedata) :
     return 100 * float(onedata['nombre']) / totalYear
 noDtpNames.loc[:,['pourcentage']] = noDtpNames.apply(lambda onedata: pourcentageCalculation(onedata), axis=1)
 
-# click interaction
-point = alt.selection_point()
+maxPercentage = np.max(noDtpNames['pourcentage'])
+# interactions
+# click
+point_vis1 = alt.selection_point()
+
+# search
+search_input_Vis1 = alt.param(
+    value='',
+    bind=alt.binding(
+        input='search',
+        placeholder="Name",
+        name='Search '
+    )
+)
+
+# slider
+slider_vis1 = alt.param(
+    value=1.0,
+    bind=alt.binding_range(min=0, max=maxPercentage, step=0.01, name='Max pourcentage ')
+)
 
 # visualisation
 vis1 = alt.Chart(noDtpNames).transform_calculate(
     genre="datum.sexe == 1 ? 'homme' : 'femme'"
+).transform_filter(
+    (alt.expr.test(alt.expr.regexp(search_input_Vis1, 'i'), alt.datum.preusuel)) &
+    (alt.datum.pourcentage <= slider_vis1)
 ).mark_line().encode(
     x=alt.X('annais:Q', title='Année'),
     y=alt.Y('pourcentage:Q', title='Popularity pourcentage (%)'),
-    color=alt.condition(point, alt.Color('preusuel:N').legend(None), alt.value('lightgray')),
-    opacity=alt.condition(point, alt.value(1), alt.value(0.05)),
+    color=alt.condition(point_vis1, alt.Color('preusuel:N').legend(None), alt.value('lightgray')),
+    opacity=alt.condition(point_vis1, alt.value(1), alt.value(0.05)),
     tooltip=[
         alt.Tooltip('preusuel:N', title='Prénom'),
         alt.Tooltip('genre:N', title='Sexe'),
         alt.Tooltip('annais:Q', title='Année'),
-        alt.Tooltip('nombre:Q', title='Nombre')
+        alt.Tooltip('nombre:Q', title='Nombre'),
+        alt.Tooltip('pourcentage:Q', title='Pourcentage')
     ],
     detail='sexe:N',
 ).properties(
     width  = 1000,
     height = 500
 ).add_params(
-    point
+    point_vis1, search_input_Vis1, slider_vis1
 )
 
 vis1.save('Html/Vis1.html')
