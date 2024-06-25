@@ -4,6 +4,8 @@ import pandas as pd
 import numpy as np
 import geopandas as gpd # Requires geopandas -- e.g.: conda install -c conda-forge geopandas
 import gpdvega
+from matplotlib import colors as mcolors
+
 
 alt.data_transformers.enable('json')
 babyNames = pd.read_csv("dpt2020.csv", sep=";")
@@ -172,54 +174,75 @@ for num in num_departments:
 vis2.save('Html/Vis2.html')
 """ Visualisation 3"""
 
+cleaned_babyNames = babyNames[babyNames['preusuel'] != '_PRENOMS_RARES']
+
+noDtpNames = cleaned_babyNames.groupby(['sexe', 'preusuel', 'annais'], as_index=False).agg({'nombre': 'sum'})
+
 most_common_names = noDtpNames.loc[noDtpNames.groupby(['sexe', 'annais'])['nombre'].idxmax()]
 
 # percentage 
 total_by_year = noDtpNames.groupby(['sexe', 'annais'])['nombre'].sum().reset_index()
 most_common_names = most_common_names.merge(total_by_year, on=['sexe', 'annais'], suffixes=('', '_total'))
 most_common_names['pourcentage'] = most_common_names['nombre'] / most_common_names['nombre_total'] * 100
-
+filtered_data = most_common_names[most_common_names['annais'].str.contains(r'^\d+$', na=False)]
+most_common_names =filtered_data
 x_domain = [0, most_common_names['pourcentage'].max()]
+
 
 #male_names = most_common_names[most_common_names['sexe'] == 1]
 
-#male
-male = alt.Chart(most_common_names).mark_bar().encode(
-    x=alt.X('pourcentage:Q', title='Proportion nom masculin (%)', scale=alt.Scale(domain=x_domain, reverse=True)),
-    y=alt.Y('annais:O', title='Année', sort=alt.EncodingSortField(field='annais', order='descending'), axis=None)
-).transform_filter(
-    alt.datum.sexe == 1
-).properties(height=alt.Step(20))
+#cell for attribution of colors for each names
 
-textmale = male.mark_text(
-    align='right',
-    baseline='middle',
-    dx=-3  
-).encode(
-    text='preusuel:N'
-)
-male_chart = male + textmale
+def generate_hex_colors(n):
+    hsv_tuples = [(x*1.0/n, 0.5, 0.5) for x in range(n)]
+    hex_colors = [mcolors.hsv_to_rgb(hsv) for hsv in hsv_tuples]
+    return [mcolors.rgb2hex(rgb) for rgb in hex_colors]
 
-#female
-female = alt.Chart(most_common_names).mark_bar().encode(
-    x=alt.X('pourcentage:Q', title='Proportion nom feminin (%)', scale=alt.Scale(domain=x_domain)),
-    y=alt.Y('annais:O', title='Année', sort=alt.EncodingSortField(field='annais', order='descending'))
-).transform_filter(
-    alt.datum.sexe == 2
-).properties(height=alt.Step(20))
+def create_color_mapping(data):
+    names_colors = {}
+    for sexe, group in data.groupby('sexe'):
+        unique_names = group['preusuel'].unique()
+        colors = generate_hex_colors(len(unique_names))
+        np.random.shuffle(colors)  
+        names_colors[sexe] = dict(zip(unique_names, colors))
+    return names_colors
 
-textfemale = female.mark_text(
-    align='left',
-    baseline='middle',
-    dx=3  
-).encode(
-    text='preusuel:N'
-)
-female_chart = female + textfemale
+color_mappings = create_color_mapping(most_common_names)
 
+def add_text_to_bars(chart, sex):
+    if(sex ==1):
+        dx_val = -3
+        return chart.mark_text(align=('right'), baseline='middle', dx=dx_val).encode(
+        text='preusuel:N'
+    )
+    else:
+        dx_val = 3
+        return chart.mark_text(align=('left'), baseline='middle', dx=dx_val).encode(
+            text='preusuel:N'
+        )
+def chart_for_sex(sex):
+    filtered_data = most_common_names[most_common_names['sexe'] == sex]
+    colors = color_mappings[sex]
+    return alt.Chart(filtered_data).mark_bar().encode(
+        x=alt.X('pourcentage:Q', title=f'Proportion nom {"masculin" if sex == 1 else "féminin"} (%)', scale=alt.Scale(domain=x_domain, reverse=(sex==1))),
+        y= alt.Y('annais:O', title='Année', sort=alt.EncodingSortField(field='annais', order='descending'),  axis=None) if sex==1 else alt.Y('annais:O', title='Année', sort=alt.EncodingSortField(field='annais', order='descending')) ,
+        color=alt.Color('preusuel:N', title='prénom', scale=alt.Scale(domain=list(colors.keys()), range=list(colors.values())), legend=None),
+        tooltip=[alt.Tooltip('preusuel:N', title='prénom'), 'pourcentage:Q']
+    ).properties(height=alt.Step(20))
+
+
+male_chart = chart_for_sex(1)
+textmale = add_text_to_bars(male_chart, 1)
+
+female_chart = chart_for_sex(2)
+textfemale = add_text_to_bars(female_chart, 2)
+
+
+female = female_chart + textfemale
+male = male_chart + textmale
 
 # showing graph
-vis3 = alt.hconcat(male_chart, female_chart).resolve_scale(y='shared')
+vis3 = alt.hconcat(male, female).resolve_scale(y='shared')
 
 vis3.save('Html/Vis3.html')
 
