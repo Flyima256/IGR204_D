@@ -39,7 +39,7 @@ All the questions can be answered exept for the unpopular part of them.
 
 ## Reviews on Visualisation 2
 ### Goals : 
-- Is there a regional effect in the data?
+- Is there a regional effect in the data ?
 - Are some names more popular in some regions? 
 - Are popular names generally popular across the whole country?
 ### Weaknesses
